@@ -1,0 +1,36 @@
+{
+  "name": "base58",
+  "description": "Fast Implementation of Base58 and Base58Check encoding",
+  "version": "0.1.0",
+  "author": {
+    "name": "Satoshi Nakamoto",
+    "email": "satoshin@gmx.com"
+  },
+  "contributors": [
+    {"name": "Stefan Thomas", "email": "moon@justmoon.net"},
+    {"name": "Andrew Schaaf", "email": "andrew@andrewschaaf.com"},
+    {"name": "Jeff Garzik", "email": "jgarzik@bitpay.com"},
+    {"name": "Stephen Pair", "email": "stephen@bitpay.com"}
+  ], 
+  "main": "./base58",
+  "keywords": [
+    "base58",
+    "base58check",
+    "base64",
+    "encoding"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/gasteve/node-base58.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "bindings": "1.1.0"
+  },
+  "devDependencies": {
+    "mocha": ">1.0.0"
+  },
+  "license": "MIT"
+}
