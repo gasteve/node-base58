@@ -1,5 +1,5 @@
 {
-  "name": "base58",
+  "name": "base58-native",
   "description": "Fast Implementation of Base58 and Base58Check encoding",
   "version": "0.1.0",
   "author": {
