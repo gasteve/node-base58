@@ -1,4 +1,4 @@
-var lib = require('bindings')('base58');
+var lib = require('./build/Release/base58.node');
 var crypto = require('crypto');
 
 // Vanilla Base58 Encoding
