@@ -27,7 +27,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "bindings": "1.1.0"
+    "bindings": ">=1.1.0"
   },
   "devDependencies": {
     "mocha": ">1.0.0"
