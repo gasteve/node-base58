@@ -1,7 +1,7 @@
 {
   "name": "base58-native",
   "description": "An Implementation of Base58 and Base58Check encoding using openssl bignumber library.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Satoshi Nakamoto",
     "email": "satoshin@gmx.com"
