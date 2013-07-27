@@ -52,7 +52,7 @@ base58_encode (const Arguments& args)
   BIGNUM *dv = BN_new();
   BIGNUM *rem = BN_new();
   
-  // TODO: compute safe length
+  // FIXME! compute safe length.
   char *str = new char[100];
   unsigned int c;
   int i, j, j2;
@@ -60,9 +60,19 @@ base58_encode (const Arguments& args)
   i = 0;
   while (BN_cmp(bn, bn0) > 0) {
     if (!BN_div(dv, rem, bn, bn58, ctx)) {
-      delete[] str;
+      BN_free(bn);
+      BN_free(bn58);
+      BN_free(bn0);
+      if (bn != dv)
+        BN_free(dv);
+      BN_free(rem);
+      BN_CTX_free(ctx);
+  
+      delete [] str;
+
       return VException("BN_div failed");
     }
+
     if (bn != dv) {
       BN_free(bn);
       bn = dv;
@@ -111,6 +121,12 @@ static Handle<Value>
 base58_decode (const Arguments& args)
 {
   HandleScope scope;
+  const char *errmsg = NULL;
+  int nLeadingZeros = 0;
+  Buffer *buf = NULL;
+  char* data = NULL;
+  unsigned int tmpLen = 0;
+  unsigned char *tmp = NULL;
   
   if (args.Length() != 1) {
     return VException("One argument expected: a String");
@@ -141,20 +157,26 @@ base58_decode (const Arguments& args)
     if (p1 == NULL) {
       while (isspace(*p))
         p++;
-      if (*p != '\0')
-        return VException("Error");
+      if (*p != '\0') {
+	errmsg = "Error";
+	goto err_out;
+      }
       break;
     }
     BN_set_word(bnChar, p1 - BASE58_ALPHABET);
-    if (!BN_mul(bn, bn, bn58, ctx))
-      return VException("BN_mul failed");
-    if (!BN_add(bn, bn, bnChar))
-      return VException("BN_add failed");
+    if (!BN_mul(bn, bn, bn58, ctx)) {
+      errmsg = "BN_mul failed";
+      goto err_out;
+    }
+    if (!BN_add(bn, bn, bnChar)) {
+      errmsg = "BN_add failed";
+      goto err_out;
+    }
   }
 
   // Get bignum as little endian data
-  unsigned int tmpLen = BN_num_bytes(bn);
-  unsigned char *tmp = (unsigned char *)malloc(tmpLen);
+  tmpLen = BN_num_bytes(bn);
+  tmp = (unsigned char *)malloc(tmpLen);
   BN_bn2bin(bn, tmp);
 
   // Trim off sign byte if present
@@ -162,13 +184,12 @@ base58_decode (const Arguments& args)
     tmpLen--;
   
   // Restore leading zeros
-  int nLeadingZeros = 0;
   for (const char* p = psz; *p == BASE58_ALPHABET[0]; p++)
     nLeadingZeros++;
 
   // Allocate buffer and zero it
-  Buffer *buf = Buffer::New(nLeadingZeros + tmpLen);
-  char* data = Buffer::Data(buf);
+  buf = Buffer::New(nLeadingZeros + tmpLen);
+  data = Buffer::Data(buf);
   memset(data, 0, nLeadingZeros + tmpLen);
   memcpy(data+nLeadingZeros, tmp, tmpLen);
 
@@ -179,6 +200,13 @@ base58_decode (const Arguments& args)
   free(tmp);
 
   return scope.Close(buf->handle_);
+
+err_out:
+  BN_free(bn58);
+  BN_free(bn);
+  BN_free(bnChar);
+  BN_CTX_free(ctx);
+  return VException(errmsg);
 }
 
 
