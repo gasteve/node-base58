@@ -60,6 +60,7 @@ base58_encode (const Arguments& args)
   i = 0;
   while (BN_cmp(bn, bn0) > 0) {
     if (!BN_div(dv, rem, bn, bn58, ctx)) {
+      delete[] str;
       return VException("BN_div failed");
     }
     if (bn != dv) {
