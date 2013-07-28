@@ -14,14 +14,9 @@
         # Currently set up to use with the following OpenSSL distro:
         
         # http://slproweb.com/products/Win32OpenSSL.html
-        [
-        'OS=="win"', 
-        {
-        'conditions':
-          [
-            [
-              'target_arch=="x64"',
-              {
+        ['OS=="win"', {
+          'conditions': [
+            ['target_arch=="x64"', {
                 'variables': {
                   'openssl_root%': 'C:/OpenSSL-Win64'
                 },
@@ -39,7 +34,7 @@
           'include_dirs': [
             '<(openssl_root)/include',
           ],
-        },
+        }],
         ['node_shared_openssl=="false"', {
           # so when "node_shared_openssl" is "false", then OpenSSL has been
           # bundled into the node executable. So we need to include the same
@@ -63,4 +58,3 @@
     }
   ]
 }
-
