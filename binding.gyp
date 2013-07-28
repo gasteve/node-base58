@@ -12,23 +12,22 @@
         # For Windows, require either a 32-bit or 64-bit
         # separately-compiled OpenSSL library.
         # Currently set up to use with the following OpenSSL distro:
-        
+
         # http://slproweb.com/products/Win32OpenSSL.html
         ['OS=="win"', {
           'conditions': [
             ['target_arch=="x64"', {
-                'variables': {
-                  'openssl_root%': 'C:/OpenSSL-Win64'
-                },
-              }, 
-              {
-                'variables': {
-                  'openssl_root%': 'C:/OpenSSL-Win32'
-                }
+               'variables': {
+                 'openssl_root%': 'C:/OpenSSL-Win64'
+               },
+            }],
+            ["target_arch=='ia32'", {
+              'variables': {
+                'openssl_root%': 'C:/OpenSSL-Win32'
               }
-            ]          
+            }]
           ],
-          'libraries': [ 
+          'libraries': [
             '-l<(openssl_root)/lib/libeay32.lib',
           ],
           'include_dirs': [
