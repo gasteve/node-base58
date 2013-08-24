@@ -1,7 +1,7 @@
 {
   "name": "base58-native",
-  "description": "An Implementation of Base58 and Base58Check encoding using openssl bignumber library.",
-  "version": "0.1.2",
+  "description": "An Implementation of Base58 and Base58Check encoding using bignum library.",
+  "version": "0.1.3",
   "author": {
     "name": "Satoshi Nakamoto",
     "email": "satoshin@gmx.com"
@@ -27,7 +27,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "bindings": ">=1.1.0"
+    "bignum": ">=0.6.1"
   },
   "devDependencies": {
     "mocha": ">1.0.0"
