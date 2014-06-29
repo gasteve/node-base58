@@ -1,77 +1,87 @@
 var crypto = require('crypto');
-var bignum = require('bignum');
 
-var globalBuffer = new Buffer(1024);
-var zerobuf = new Buffer(0);
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-var ALPHABET_ZERO = ALPHABET[0];
-var ALPHABET_BUF = new Buffer(ALPHABET, 'ascii');
 var ALPHABET_INV = {};
 for(var i=0; i < ALPHABET.length; i++) {
   ALPHABET_INV[ALPHABET[i]] = i;
-};
+}
 
 // Vanilla Base58 Encoding
 var base58 = {
   encode: function(buf) {
-    var str;
-    var x = bignum.fromBuffer(buf);
-    var r;
+    if(buf.length == 0) return '';
 
-    if(buf.length < 512) {
-      str = globalBuffer;
-    } else {
-      str = new Buffer(buf.length << 1);
-    }
-    var i = str.length - 1;
-    while(x.gt(0)) {
-      r = x.mod(58);
-      x = x.div(58);
-      str[i] = ALPHABET_BUF[r.toNumber()];
-      i--;
+    var i, j, digits = [0];
+    for(i = 0; i < buf.length; i++) {
+      for(j = 0; j < digits.length; j++) {
+        digits[j] <<= 8;
+      }
+      digits[digits.length - 1] += buf[i];
+
+      var carry = 0;
+      for(j = digits.length - 1; j >= 0; j--){
+        digits[j] += carry;
+        carry = (digits[j] / 58) | 0;
+        digits[j] %= 58;
+      }
+
+      while(carry) {
+        digits.unshift(carry);
+        carry = (digits[0] / 58) | 0;
+        digits[0] %= 58;
+      }
     }
 
     // deal with leading zeros
-    var j=0;
-    while(buf[j] == 0) {
-      str[i] = ALPHABET_BUF[0];
-      j++; i--;
+    for(i = 0; i < buf.length - 1 && buf[i] == 0; i++) {
+      digits.unshift(0);
     }
 
-    return str.slice(i+1,str.length).toString('ascii');
+    return digits.map(function(digit) { return ALPHABET[digit]; }).join('');
   },
 
   decode: function(str) {
-    if(str.length == 0) return zerobuf;
-    var answer = bignum(0);
-    for(var i=0; i<str.length; i++) {
-      answer = answer.mul(58);
-      answer = answer.add(ALPHABET_INV[str[i]]);
-    };
-    var i = 0;
-    while(i < str.length && str[i] == ALPHABET_ZERO) {
-      i++;
+    if(str.length == 0) return new Buffer([]);
+
+    var input = str.split('').map(function(c){ return ALPHABET_INV[c]; });
+
+    var i, j, bytes = [0];
+    for(i = 0; i < input.length; i++) {
+      for(j = 0; j < bytes.length; j++) {
+        bytes[j] *= 58;
+      }
+      bytes[bytes.length - 1] += input[i];
+
+      var carry = 0;
+      for(j = bytes.length - 1; j >= 0; j--){
+        bytes[j] += carry;
+        carry = bytes[j] >> 8;
+        bytes[j] &= 0xff;
+      }
+
+      while(carry) {
+        bytes.unshift(carry);
+        carry = bytes[0] >> 8;
+        bytes[0] &= 0xff;
+      }
     }
-    if(i > 0) {
-      var zb = new Buffer(i);
-      zb.fill(0);
-      if(i == str.length) return zb;
-      answer = answer.toBuffer();
-      return Buffer.concat([zb, answer], i+answer.length);
-    } else {
-      return answer.toBuffer();
+
+    for(i = 0; i < input.length - 1 && input[i] == 0; i++) {
+      bytes.unshift(0);
     }
-  },
+
+    return new Buffer(bytes);
+  }
 };
 
 // Base58Check Encoding
 function sha256(data) {
   return new Buffer(crypto.createHash('sha256').update(data).digest('binary'), 'binary');
-};
+}
 
 function doubleSHA256(data) {
   return sha256(sha256(data));
-};
+}
 
 var base58Check = {
   encode: function(buf) {
@@ -99,14 +109,7 @@ var base58Check = {
     }
 
     return data;
-  },
-};
-
-// if you frequently do base58 encodings with data larger
-// than 512 bytes, you can use this method to expand the
-// size of the reusable buffer
-exports.setBuffer = function(buf) {
-  globalBuffer = buf;
+  }
 };
 
 exports.base58 = base58;
