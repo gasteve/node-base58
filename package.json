@@ -10,7 +10,8 @@
     {"name": "Stefan Thomas", "email": "moon@justmoon.net"},
     {"name": "Andrew Schaaf", "email": "andrew@andrewschaaf.com"},
     {"name": "Jeff Garzik", "email": "jgarzik@bitpay.com"},
-    {"name": "Stephen Pair", "email": "stephen@bitpay.com"}
+    {"name": "Stephen Pair", "email": "stephen@bitpay.com"},
+    {"name": "Jared Deckard", "email": "jared.deckard@gmail.com"}
   ], 
   "main": "./base58",
   "keywords": [
@@ -25,9 +26,6 @@
   },
   "scripts": {
     "test": "mocha"
-  },
-  "dependencies": {
-    "bignum": ">=0.6.1"
   },
   "devDependencies": {
     "mocha": ">1.0.0"
