@@ -14,7 +14,12 @@ var testData = [
   ["ecac89cad93923c02321", "EJDM8drfXA6uyA", "2W1Yd5Zu6WGyKVtHGMrH"],
   ["10c8511e", "Rt5zm", "3op3iuGMmhs"],
   ["00000000000000000000", "1111111111", "111111111146Momb"],
-  ["", "", "3QJmnh"]
+  ["", "", "3QJmnh"],
+  ["0062e907b15cbf27d5425399ebf6f0fb50ebb88f18", "12NvYg7CXwVYtMDYia7n9viekJ6d5", "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"]
+];
+
+var invalidTestData = [
+  "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNb"
 ];
 
 suite('basic');
@@ -45,5 +50,17 @@ test('allData', function() {
     base58.decodeTest(raw, b58);
     base58Check.encodeTest(raw, b58Check);
     base58Check.decodeTest(raw, b58Check);
+  });
+
+  base58Check.invalidDecodeTest = function(b58str) {
+    assert.throws(function(){
+        base58Check.decode(b58str);
+      },
+      /checksum mismatch/
+    );
+  };
+
+  invalidTestData.forEach(function(datum) {
+    base58Check.invalidDecodeTest(datum);
   });
 });
