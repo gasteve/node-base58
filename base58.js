@@ -94,7 +94,7 @@ var base58Check = {
     var hash = doubleSHA256(data);
     var hash4 = hash.slice(0, 4);
 
-    if (csum.toString() != hash4.toString()) {
+    if (csum.toString('hex') != hash4.toString('hex')) {
       throw new Error("checksum mismatch");
     }
 
